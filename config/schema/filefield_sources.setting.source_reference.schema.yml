@@ -1,0 +1,7 @@
+filefield_sources.setting.source_reference:
+  type: mapping
+  label: 'Autocomplete reference options'
+  mapping:
+    autocomplete:
+      type: string
+      label: 'Match file name'
