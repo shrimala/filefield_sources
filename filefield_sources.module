@@ -169,13 +169,11 @@ function filefield_sources_field_process(&$element, FormStateInterface $form_sta
     elseif (isset($source['class'])) {
       $callback = array($source['class'], 'process');
       if (is_callable($callback)) {
-        $element = call_user_func_array(
-          $callback, array(
-            $element,
-            $form_state,
-            $complete_form,
-          )
-        );
+        $element = call_user_func_array($callback, array(
+          $element,
+          $form_state,
+          $complete_form,
+        ));
       }
     }
   }
@@ -190,7 +188,7 @@ function filefield_sources_field_process(&$element, FormStateInterface $form_sta
   if (!isset($enabled_sources['upload'])) {
     foreach (array('upload_button', 'upload') as $field) {
       if (isset($element[$field])) {
-        $element[$field]['#access'] = false;
+        $element[$field]['#access'] = FALSE;
       }
     }
   }
@@ -265,7 +263,7 @@ function filefield_sources_field_pre_render($element) {
   if (!empty($element['#value']['fids'])) {
     foreach (Element::children($element) as $key) {
       if (!empty($element[$key]['#filefield_source'])) {
-        $element[$key]['#access'] = false;
+        $element[$key]['#access'] = FALSE;
       }
     }
   }
@@ -302,9 +300,9 @@ function filefield_sources_field_validate(&$element, FormStateInterface $form_st
  * Duplicate of \Drupal\file\Plugin\Field\FieldWidget\FileWidget::submit(), with
  * a few changes:
  *   - Submit button is one level down compare to 'Upload' source's submit
- *   button.
+ *     button.
  *   - Replace static in static::getWidgetState and static::setWidgetState by
- *   WidgetBase.
+ *     WidgetBase.
  *   - Rebuild the form after all.
  */
 function filefield_sources_field_submit(&$form, FormStateInterface $form_state) {
@@ -441,17 +439,15 @@ function filefield_sources_list($include_default = TRUE) {
  *
  * @see file_save_upload()
  */
-function filefield_sources_save_file($filepath, $validators = array(), $destination = false, $replace = FILE_EXISTS_RENAME) {
+function filefield_sources_save_file($filepath, $validators = array(), $destination = FALSE, $replace = FILE_EXISTS_RENAME) {
   $user = \Drupal::currentUser();
 
   // Begin building file object.
-  $file = entity_create(
-    'file', array(
-      'uri' => $filepath,
-      'uid' => $user->id(),
-      'status' => FILE_EXISTS_RENAME,
-    )
-  );
+  $file = entity_create('file', array(
+    'uri' => $filepath,
+    'uid' => $user->id(),
+    'status' => FILE_EXISTS_RENAME,
+  ));
   $file->setFilename(trim(basename($filepath), '.'));
   $file->setMimeType(\Drupal::service('file.mime_type.guesser')->guess($file->getFilename()));
   $file->setSize(filesize($filepath));
@@ -508,7 +504,7 @@ function filefield_sources_save_file($filepath, $validators = array(), $destinat
   $destination_scheme = file_uri_scheme($destination);
   if (!$destination_scheme || !file_stream_wrapper_valid_scheme($destination_scheme)) {
     drupal_set_message(t('The file could not be uploaded, because the destination %destination is invalid.', array('%destination' => $destination)), 'error');
-    return false;
+    return FALSE;
   }
 
   // A URI may already have a trailing slash or look like "public://".
@@ -520,11 +516,11 @@ function filefield_sources_save_file($filepath, $validators = array(), $destinat
   file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
 
   $file->destination = file_destination($destination . $file->getFilename(), $replace);
-  // If file_destination() returns false then $replace == FILE_EXISTS_ERROR and
+  // If file_destination() returns FALSE then $replace == FILE_EXISTS_ERROR and
   // there's an existing file so we need to bail.
-  if ($file->destination === false) {
+  if ($file->destination === FALSE) {
     drupal_set_message(t('The file %source could not be uploaded because a file by that name already exists in the destination %directory.', array('%source' => $file->getFilename(), '%directory' => $destination)), 'error');
-    return false;
+    return FALSE;
   }
 
   // Add in our check of the the file name length.
@@ -543,7 +539,7 @@ function filefield_sources_save_file($filepath, $validators = array(), $destinat
       $message .= ' ' . array_pop($errors);
     }
     drupal_set_message($message, 'error');
-    return false;
+    return FALSE;
   }
 
   // Move uploaded files from PHP's upload_tmp_dir to Drupal's temporary
@@ -553,7 +549,7 @@ function filefield_sources_save_file($filepath, $validators = array(), $destinat
   if (!file_unmanaged_copy($filepath, $file->getFileUri(), $replace)) {
     drupal_set_message(t('File upload error. Could not move uploaded file.'), 'error');
     \Drupal::logger('filefield_sources')->log(E_NOTICE, 'Upload error. Could not move uploaded file %file to destination %destination.', array('%file' => $file->getFilename(), '%destination' => $file->getFileUri()));
-    return false;
+    return FALSE;
   }
 
   // Set the permissions on the new file.

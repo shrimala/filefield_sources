@@ -116,7 +116,7 @@ class Remote implements FilefieldSourceInterface {
         $pathinfo = pathinfo($filename);
       }
 
-      $filename = filefield_sources_clean_filename($filename, $field->settings['file_extensions']);
+      $filename = filefield_sources_clean_filename($filename, $field->getSetting('file_extensions'));
       $filepath = file_create_filename($filename, $temporary_directory);
 
       if (empty($pathinfo['extension'])) {
@@ -125,7 +125,7 @@ class Remote implements FilefieldSourceInterface {
       }
 
       // Perform basic extension check on the file before trying to transfer.
-      $extensions = $field->settings['file_extensions'];
+      $extensions = $field->getSetting('file_extensions');
       $regex = '/\.(' . preg_replace('/[ +]/', '|', preg_quote($extensions)) . ')$/i';
       if (!empty($extensions) && !preg_match($regex, $filename)) {
         $form_state->setError($element, t('Only files with the following extensions are allowed: %files-allowed.', array('%files-allowed' => $extensions)));
